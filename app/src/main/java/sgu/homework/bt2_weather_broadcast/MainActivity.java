@@ -100,10 +100,20 @@ public class MainActivity extends AppCompatActivity {
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     WeatherResponse weatherData = response.body();
+                    
+                    float temp = weatherData.getMain().getTemp();
+                    int humidity = weatherData.getMain().getHumidity();
+                    float windSpeed = (weatherData.getWind() != null) ? weatherData.getWind().getSpeed() : 0;
+                    float rain = (weatherData.getRain() != null) ? weatherData.getRain().getH1() : 0;
+                    String description = weatherData.getWeather().get(0).getDescription();
+
                     String info = "City: " + weatherData.getCityName() + "\n" +
-                            "Temp: " + weatherData.getMain().getTemp() + "°C\n" +
-                            "Humidity: " + weatherData.getMain().getHumidity() + "%\n" +
-                            "Description: " + weatherData.getWeather().get(0).getDescription();
+                            "Temp: " + temp + "°C\n" +
+                            "Humidity: " + humidity + "%\n" +
+                            "Wind Speed: " + windSpeed + " m/s\n" +
+                            "Rain (1h): " + rain + " mm\n" +
+                            "Description: " + description;
+
                     tvResult.setText(info);
                 } else {
                     tvResult.setText("Error: City not found or API problem.");

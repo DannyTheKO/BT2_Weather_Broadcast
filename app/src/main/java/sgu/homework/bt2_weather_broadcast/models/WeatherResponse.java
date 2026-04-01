@@ -10,6 +10,12 @@ public class WeatherResponse {
     @SerializedName("weather")
     private List<Weather> weather;
 
+    @SerializedName("wind")
+    private Wind wind;
+
+    @SerializedName("rain")
+    private Rain rain;
+
     @SerializedName("name")
     private String cityName;
 
@@ -19,6 +25,14 @@ public class WeatherResponse {
 
     public List<Weather> getWeather() {
         return weather;
+    }
+
+    public Wind getWind() {
+        return wind;
+    }
+
+    public Rain getRain() {
+        return rain;
     }
 
     public String getCityName() {
