@@ -19,6 +19,12 @@ public class WeatherResponse {
     @SerializedName("name")
     private String cityName;
 
+    @SerializedName("dt")
+    private Long dt;
+
+    @SerializedName("sys")
+    private Sys sys;
+
     public Main getMain() {
         return main;
     }
@@ -38,4 +44,8 @@ public class WeatherResponse {
     public String getCityName() {
         return cityName;
     }
+
+    public Long getDt() { return dt; }
+
+    public Sys getSys() { return sys; }
 }
