@@ -1,5 +1,6 @@
 package sgu.homework.bt2_weather_broadcast;
 
+
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,10 +14,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import sgu.homework.bt2_weather_broadcast.adapters.ForecastAdapter;
+import sgu.homework.bt2_weather_broadcast.models.ForecastResponse;
 import sgu.homework.bt2_weather_broadcast.models.WeatherResponse;
 import sgu.homework.bt2_weather_broadcast.repository.WeatherRepository;
 import sgu.homework.bt2_weather_broadcast.utils.LocationHelper;
@@ -29,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvResult;
     private WeatherRepository weatherRepository;
     private LocationHelper locationHelper;
+    
+    private RecyclerView rvForecast;
+    private ForecastAdapter forecastAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,15 +48,20 @@ public class MainActivity extends AppCompatActivity {
         Button btnFetch = findViewById(R.id.btnFetch);
         Button btnLocationFetch = findViewById(R.id.btnLocationFetch);
         tvResult = findViewById(R.id.textView_output_weather);
+        rvForecast = findViewById(R.id.rvForecast);
 
-        // API Key is set here
-        weatherRepository = new WeatherRepository("2058149d7584ab7f0d7a52abcea34d12");
+        // Initialize Adapter
+        forecastAdapter = new ForecastAdapter(new ArrayList<>());
+        rvForecast.setAdapter(forecastAdapter);
+
+        // API Key
+        weatherRepository = new WeatherRepository(BuildConfig.openWeatherMap_API_KEY);
         locationHelper = new LocationHelper(this);
 
         btnFetch.setOnClickListener(v -> {
             String city = cityInput.getText().toString().trim();
             if (!city.isEmpty()) {
-                fetchWeather(city);
+                fetchWeatherAndForecast(city);
             } else {
                 Toast.makeText(this, "Please enter a city name", Toast.LENGTH_SHORT).show();
             }
@@ -72,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public void onLocationFound(double latitude, double longitude) {
                 Log.d(TAG, "Location found: " + latitude + ", " + longitude);
                 fetchWeatherByCoords(latitude, longitude);
+                fetchForecastByCoords(latitude, longitude);
             }
 
             @Override
@@ -88,6 +103,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchWeatherAndForecast(String cityName) {
+        fetchWeather(cityName);
+        fetchForecast(cityName);
+    }
+
     private void fetchWeather(String cityName) {
         Log.d(TAG, "Fetching weather for city: " + cityName);
         tvResult.setText("Fetching weather for " + cityName + "...");
@@ -101,6 +121,22 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<WeatherResponse> call, Throwable t) {
                 Log.e(TAG, "fetchWeather onFailure: " + t.getMessage());
                 tvResult.setText("Network Failure: " + t.getMessage());
+            }
+        });
+    }
+
+    private void fetchForecast(String cityName) {
+        weatherRepository.fetchForecast(cityName, new Callback<ForecastResponse>() {
+            @Override
+            public void onResponse(Call<ForecastResponse> call, Response<ForecastResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    forecastAdapter.setForecastList(response.body().getList());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ForecastResponse> call, Throwable t) {
+                Log.e(TAG, "fetchForecast onFailure: " + t.getMessage());
             }
         });
     }
@@ -122,12 +158,27 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchForecastByCoords(double lat, double lon) {
+        weatherRepository.fetchForecastByCoords(lat, lon, new Callback<ForecastResponse>() {
+            @Override
+            public void onResponse(Call<ForecastResponse> call, Response<ForecastResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    forecastAdapter.setForecastList(response.body().getList());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ForecastResponse> call, Throwable t) {
+                Log.e(TAG, "fetchForecastByCoords onFailure: " + t.getMessage());
+            }
+        });
+    }
+
     private void handleWeatherResponse(Response<WeatherResponse> response) {
         if (response.isSuccessful() && response.body() != null) {
             WeatherResponse weatherData = response.body();
             Log.d(TAG, "Weather response successful for: " + weatherData.getCityName());
             
-            // Update the UI with the city name from the API
             if (weatherData.getCityName() != null) {
                 cityInput.setText(weatherData.getCityName());
             }

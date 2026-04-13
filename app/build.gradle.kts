@@ -1,3 +1,12 @@
+import java.util.Properties;
+
+// 1. Load the local.properties file
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use { localProperties.load(it) }
+}
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -14,7 +23,17 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // 2. Fetch the key and add it as a BuildConfig field
+        // Replace "API_KEY" with the exact name you used in local.properties
+        val apiKey = localProperties.getProperty("openWeatherMap_API_KEY") ?: ""
+        buildConfigField("String", "openWeatherMap_API_KEY", "\"$apiKey\"")
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
 
     buildTypes {
         release {
@@ -35,6 +54,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.play.services.location)
+    implementation(libs.glide)
 
     implementation(libs.appcompat)
     implementation(libs.material)
