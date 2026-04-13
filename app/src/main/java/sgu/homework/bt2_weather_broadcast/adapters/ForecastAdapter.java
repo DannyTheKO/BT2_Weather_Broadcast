@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import sgu.homework.bt2_weather_broadcast.R;
-import sgu.homework.bt2_weather_broadcast.models.ForecastItem;
+import sgu.homework.bt2_weather_broadcast.data.models.ForecastItem;
 
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastViewHolder> {
 

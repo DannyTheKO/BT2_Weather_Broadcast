@@ -1,20 +1,16 @@
-package sgu.homework.bt2_weather_broadcast.models;
+package sgu.homework.bt2_weather_broadcast.data.models;
 
 import com.google.gson.annotations.SerializedName;
 
 public class Sys {
     @SerializedName("country")
     private String country;
-
     @SerializedName("sunrise")
-    private Long sunrise;
-
+    private long sunrise;
     @SerializedName("sunset")
-    private Long sunset;
+    private long sunset;
 
     public String getCountry() { return country; }
-
-    public Long getSunrise() { return sunrise; }
-
-    public Long getSunset() { return sunset; }
+    public long getSunrise() { return sunrise; }
+    public long getSunset() { return sunset; }
 }
