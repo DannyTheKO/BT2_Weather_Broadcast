@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import sgu.homework.bt2_weather_broadcast.R;
@@ -18,14 +19,22 @@ import sgu.homework.bt2_weather_broadcast.data.models.ForecastItem;
 
 public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.ForecastViewHolder> {
 
-    private List<ForecastItem> forecastList;
+    private List<ForecastItem> forecastList = new ArrayList<>();
+    private String unitSymbol = "°C";
 
     public ForecastAdapter(List<ForecastItem> forecastList) {
-        this.forecastList = forecastList;
+        if (forecastList != null) {
+            this.forecastList = forecastList;
+        }
     }
 
     public void setForecastList(List<ForecastItem> forecastList) {
-        this.forecastList = forecastList;
+        this.forecastList = forecastList != null ? forecastList : new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    public void setUnitSymbol(String unitSymbol) {
+        this.unitSymbol = unitSymbol;
         notifyDataSetChanged();
     }
 
@@ -47,7 +56,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
             holder.tvTime.setText(timeStr.substring(11, 16));
         }
 
-        holder.tvTemp.setText(Math.round(item.getMain().getTemp()) + "°C");
+        holder.tvTemp.setText(Math.round(item.getMain().getTemp()) + unitSymbol);
 
         if (item.getWeather() != null && !item.getWeather().isEmpty()) {
             String iconCode = item.getWeather().get(0).getIcon();
@@ -61,7 +70,7 @@ public class ForecastAdapter extends RecyclerView.Adapter<ForecastAdapter.Foreca
 
     @Override
     public int getItemCount() {
-        return forecastList != null ? forecastList.size() : 0;
+        return forecastList.size();
     }
 
     static class ForecastViewHolder extends RecyclerView.ViewHolder {

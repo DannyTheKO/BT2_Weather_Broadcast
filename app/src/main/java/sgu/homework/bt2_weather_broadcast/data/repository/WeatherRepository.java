@@ -15,19 +15,19 @@ public class WeatherRepository {
         this.weatherService = RetrofitClient.getService();
     }
 
-    public void fetchWeather(String cityName, Callback<WeatherResponse> callback) {
-        weatherService.getWeatherByCity(cityName, apiKey, "metric").enqueue(callback);
+    public void fetchWeather(String cityName, String units, Callback<WeatherResponse> callback) {
+        weatherService.getWeatherByCity(cityName, apiKey, units).enqueue(callback);
     }
 
-    public void fetchForecast(String cityName, Callback<ForecastResponse> callback) {
-        weatherService.getForecastByCity(cityName, apiKey, "metric").enqueue(callback);
+    public void fetchForecast(String cityName, String units, Callback<ForecastResponse> callback) {
+        weatherService.getForecastByCity(cityName, apiKey, units).enqueue(callback);
     }
 
-    public void fetchWeatherByCoords(double lat, double lon, Callback<WeatherResponse> callback) {
-        weatherService.getWeatherByCoords(lat, lon, apiKey, "metric").enqueue(callback);
+    public void fetchWeatherByCoords(double lat, double lon, String units, Callback<WeatherResponse> callback) {
+        weatherService.getWeatherByCoords(lat, lon, apiKey, units).enqueue(callback);
     }
 
-    public void fetchForecastByCoords(double lat, double lon, Callback<ForecastResponse> callback) {
-        weatherService.getForecastByCoords(lat, lon, apiKey, "metric").enqueue(callback);
+    public void fetchForecastByCoords(double lat, double lon, String units, Callback<ForecastResponse> callback) {
+        weatherService.getForecastByCoords(lat, lon, apiKey, units).enqueue(callback);
     }
 }

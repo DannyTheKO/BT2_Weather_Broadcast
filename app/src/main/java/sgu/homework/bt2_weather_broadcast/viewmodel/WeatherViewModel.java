@@ -18,6 +18,7 @@ public class WeatherViewModel extends ViewModel {
     private final MutableLiveData<ForecastResponse> forecastData = new MutableLiveData<>();
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
+    private String currentUnits = "metric";
 
     public WeatherViewModel(WeatherRepository repository) {
         this.repository = repository;
@@ -39,6 +40,14 @@ public class WeatherViewModel extends ViewModel {
         return isLoading;
     }
 
+    public void setUnits(String units) {
+        this.currentUnits = units;
+    }
+
+    public String getUnits() {
+        return currentUnits;
+    }
+
     public void fetchWeatherAndForecast(String cityName) {
         isLoading.setValue(true);
         fetchWeather(cityName);
@@ -52,7 +61,7 @@ public class WeatherViewModel extends ViewModel {
     }
 
     private void fetchWeather(String cityName) {
-        repository.fetchWeather(cityName, new Callback<WeatherResponse>() {
+        repository.fetchWeather(cityName, currentUnits, new Callback<WeatherResponse>() {
             @Override
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -72,7 +81,7 @@ public class WeatherViewModel extends ViewModel {
     }
 
     private void fetchForecast(String cityName) {
-        repository.fetchForecast(cityName, new Callback<ForecastResponse>() {
+        repository.fetchForecast(cityName, currentUnits, new Callback<ForecastResponse>() {
             @Override
             public void onResponse(Call<ForecastResponse> call, Response<ForecastResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -92,7 +101,7 @@ public class WeatherViewModel extends ViewModel {
     }
 
     private void fetchWeatherByCoords(double lat, double lon) {
-        repository.fetchWeatherByCoords(lat, lon, new Callback<WeatherResponse>() {
+        repository.fetchWeatherByCoords(lat, lon, currentUnits, new Callback<WeatherResponse>() {
             @Override
             public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -112,7 +121,7 @@ public class WeatherViewModel extends ViewModel {
     }
 
     private void fetchForecastByCoords(double lat, double lon) {
-        repository.fetchForecastByCoords(lat, lon, new Callback<ForecastResponse>() {
+        repository.fetchForecastByCoords(lat, lon, currentUnits, new Callback<ForecastResponse>() {
             @Override
             public void onResponse(Call<ForecastResponse> call, Response<ForecastResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {

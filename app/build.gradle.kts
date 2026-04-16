@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.play.services.location)
     implementation(libs.glide)
+    implementation(libs.androidx.work.runtime)
 
     implementation(libs.appcompat)
     implementation(libs.material)
