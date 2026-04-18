@@ -80,7 +80,7 @@ public class WeatherWorker extends Worker {
                     "Thunderstorm detected: " + weather.getDescription());
             } else if (id >= 500 && id < 600) {
                  NotificationHelper.showNotification(getApplicationContext(), 
-                    "Heavy Rain Alert", 
+                    "Rain Alert",
                     "Expect rain: " + weather.getDescription());
             } else if (id >= 600 && id < 700) {
                 NotificationHelper.showNotification(getApplicationContext(), 

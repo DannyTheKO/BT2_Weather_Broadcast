@@ -19,6 +19,7 @@ public class WeatherViewModel extends ViewModel {
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     private String currentUnits = "metric";
+    private int activeRequests = 0;
 
     public WeatherViewModel(WeatherRepository repository) {
         this.repository = repository;
@@ -49,15 +50,27 @@ public class WeatherViewModel extends ViewModel {
     }
 
     public void fetchWeatherAndForecast(String cityName) {
-        isLoading.setValue(true);
+        startLoading();
         fetchWeather(cityName);
         fetchForecast(cityName);
     }
 
     public void fetchWeatherAndForecastByCoords(double lat, double lon) {
-        isLoading.setValue(true);
+        startLoading();
         fetchWeatherByCoords(lat, lon);
         fetchForecastByCoords(lat, lon);
+    }
+
+    private void startLoading() {
+        activeRequests = 2; // Weather + Forecast
+        isLoading.setValue(true);
+    }
+
+    private void checkLoadingFinished() {
+        activeRequests--;
+        if (activeRequests <= 0) {
+            isLoading.setValue(false);
+        }
     }
 
     private void fetchWeather(String cityName) {
@@ -138,9 +151,5 @@ public class WeatherViewModel extends ViewModel {
                 checkLoadingFinished();
             }
         });
-    }
-
-    private void checkLoadingFinished() {
-        isLoading.setValue(false);
     }
 }

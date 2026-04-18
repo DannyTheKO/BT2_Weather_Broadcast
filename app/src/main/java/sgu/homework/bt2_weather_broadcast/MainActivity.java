@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -36,11 +39,17 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "WeatherPrefs";
     private static final String KEY_LAST_CITY = "last_city";
     private static final String KEY_UNITS = "units";
-    
+
     private EditText cityInput;
-    private TextView tvResult;
+    private TextView tvLog;
+    private TextView tvCity;
+    private TextView tvTemp;
+    private TextView tvHumidity;
+    private TextView tvWindSpeed;
+    private TextView tvRain;
+    private TextView tvDescription;
+
     private LocationHelper locationHelper;
-    
     private RecyclerView rvForecast;
     private ForecastAdapter forecastAdapter;
     private WeatherViewModel viewModel;
@@ -58,7 +67,15 @@ public class MainActivity extends AppCompatActivity {
         cityInput = findViewById(R.id.cityInput);
         Button btnFetch = findViewById(R.id.btnFetch);
         Button btnLocationFetch = findViewById(R.id.btnLocationFetch);
-        tvResult = findViewById(R.id.textView_output_weather);
+
+        tvLog = findViewById(R.id.textView_output_log);
+        tvCity = findViewById(R.id.textView_output_weather_cityName);
+        tvTemp = findViewById(R.id.textView_output_weather_temperature);
+        tvHumidity = findViewById(R.id.textView_output_weather_humidity);
+        tvWindSpeed = findViewById(R.id.textView_output_weather_windSpeed);
+        tvRain = findViewById(R.id.textView_output_weather_rain);
+        tvDescription = findViewById(R.id.textView_output_weather_description);
+
         rvForecast = findViewById(R.id.rvForecast);
         unitToggleGroup = findViewById(R.id.unitToggleGroup);
 
@@ -96,12 +113,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         btnFetch.setOnClickListener(v -> {
-            String city = cityInput.getText().toString().trim();
-            if (!city.isEmpty()) {
-                viewModel.fetchWeatherAndForecast(city);
-            } else {
-                Toast.makeText(this, "Please enter a city name", Toast.LENGTH_SHORT).show();
+            performSearch();
+        });
+
+        cityInput.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || 
+                actionId == EditorInfo.IME_ACTION_DONE ||
+                (event != null && event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
+                performSearch();
+                return true;
             }
+            return false;
         });
 
         btnLocationFetch.setOnClickListener(v -> {
@@ -120,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 if (!newUnits.equals(viewModel.getUnits())) {
                     viewModel.setUnits(newUnits);
                     prefs.edit().putString(KEY_UNITS, newUnits).apply();
-                    
+
                     // Refresh data with new units
                     String city = cityInput.getText().toString().trim();
                     if (!city.isEmpty()) {
@@ -129,6 +151,23 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void performSearch() {
+        String city = cityInput.getText().toString().trim();
+        if (!city.isEmpty()) {
+            viewModel.fetchWeatherAndForecast(city);
+            hideKeyboard();
+        } else {
+            Toast.makeText(this, "Please enter a city name", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void hideKeyboard() {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null && getCurrentFocus() != null) {
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
     }
 
     private void checkNotificationPermission() {
@@ -162,14 +201,16 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.getErrorMessage().observe(this, error -> {
             if (error != null) {
-                tvResult.setText(error);
+                tvLog.setText(error);
                 Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
             }
         });
 
         viewModel.getIsLoading().observe(this, isLoading -> {
             if (isLoading) {
-                tvResult.setText("Loading...");
+                tvLog.setText("Loading...");
+            } else {
+                tvLog.setText("Fetch Complete!");
             }
         });
     }
@@ -188,14 +229,18 @@ public class MainActivity extends AppCompatActivity {
         String unitSymbol = viewModel.getUnits().equals("imperial") ? "°F" : "°C";
         String windUnit = viewModel.getUnits().equals("imperial") ? "mph" : "m/s";
 
-        String info = "City: " + weatherData.getCityName() + "\n" +
-                "Temp: " + temp + unitSymbol + "\n" +
-                "Humidity: " + humidity + "%\n" +
-                "Wind Speed: " + windSpeed + " " + windUnit + "\n" +
-                "Rain (1h): " + rain + " mm\n" +
-                "Description: " + description;
+        String cityName = "City Name: " + weatherData.getCityName();
+        String temperature = "Temperature: " + temp + unitSymbol;
+        String humidityText = "Humidity: " + humidity + "%";
+        String windSpeedText = "Wind Speed: " + windSpeed + " " + windUnit;
+        String rainText = "Rain (last hour): " + rain + "mm";
 
-        tvResult.setText(info);
+        tvCity.setText(cityName);
+        tvTemp.setText(temperature);
+        tvHumidity.setText(humidityText);
+        tvWindSpeed.setText(windSpeedText);
+        tvRain.setText(rainText);
+        tvDescription.setText(description);
     }
 
     private void getCurrentLocationAndWeather() {
@@ -212,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(String message) {
-                tvResult.setText("Location error: " + message);
+                tvLog.setText("Location error: " + message);
             }
         });
     }

@@ -21,7 +21,7 @@
             android:id="@+id/tvTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12:00"
+            android:text="@string/_12_00"
             android:textColor="@color/text_secondary"
             android:textSize="12sp"
             android:textStyle="normal" />
@@ -32,7 +32,7 @@
             android:layout_height="45dp"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="4dp"
-            android:contentDescription="Weather Icon"
+            android:contentDescription="@string/weather_icon"
             android:scaleType="fitCenter"
             android:src="@android:drawable/ic_menu_report_image" />
 
@@ -40,7 +40,7 @@
             android:id="@+id/tvTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="25°C"
+            android:text="@string/_25_c"
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="bold" />

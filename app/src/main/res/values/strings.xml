@@ -4,4 +4,10 @@
     <string name="enter_city_name">Enter City Name</string>
     <string name="placeholder_weather_output">Weather info will appear here</string>
     <string name="fetch_current_location">Fetch Current Location</string>
+    <string name="hourly_forecast">Hourly Forecast</string>
+    <string name="f_unit">°F</string>
+    <string name="c_unit">°C</string>
+    <string name="weather_icon">Weather Icon</string>
+    <string name="_12_00">12:00</string>
+    <string name="_25_c">25°C</string>
 </resources>
